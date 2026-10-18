@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="380" viewBox="0 0 1000 380">
+<style>
+text{font-family:ui-monospace,'JetBrains Mono','Fira Code','Cascadia Code',SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace;}
+.t{fill:#d7dde5} .d{fill:#7b8594} .m{fill:#4a5361}
+.y{fill:#ffd23f} .b{fill:#4c9aff} .g{fill:#5cff9d} .r{fill:#ff5c6c} .v{fill:#b28cff}
+.in{opacity:0;animation:in .01s linear forwards}
+@keyframes in{to{opacity:1}}
+.blink{animation:blink 1.05s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.m0{transform-box:fill-box;transform-origin:center;animation:mrot 16s linear infinite;animation-delay:-0.000s}
+.m1{transform-box:fill-box;transform-origin:center;animation:mrot 16s linear infinite;animation-delay:-1.000s}
+.m2{transform-box:fill-box;transform-origin:center;animation:mrot 16s linear infinite;animation-delay:-2.000s}
+.m3{transform-box:fill-box;transform-origin:center;animation:mrot 16s linear infinite;animation-delay:-3.000s}
+.m4{transform-box:fill-box;transform-origin:center;animation:mrot 16s linear infinite;animation-delay:-4.000s}
+.m5{transform-box:fill-box;transform-origin:center;animation:mrot 16s linear infinite;animation-delay:-5.000s}
+.m6{transform-box:fill-box;transform-origin:center;animation:mrot 16s linear infinite;animation-delay:-6.000s}
+.m7{transform-box:fill-box;transform-origin:center;animation:mrot 16s linear infinite;animation-delay:-7.000s}
+@keyframes mrot{0%{transform:scaleX(0)}25%{transform:scaleX(1)}50%{transform:scaleX(0)}75%{transform:scaleX(-1)}100%{transform:scaleX(0)}}
+.orbit-cw{transform-origin:230px 200px;animation:ocw 18s linear infinite}
+@keyframes ocw{to{transform:rotate(360deg)}}
+.orbit-ccw{transform-origin:230px 200px;animation:occw 26s linear infinite}
+@keyframes occw{to{transform:rotate(-360deg)}}
+.sat-orbit{transform-origin:230px 200px;animation:ocw 22s linear infinite}
+.gpulse{transform-box:fill-box;transform-origin:center;animation:gpulse 2.6s ease-out infinite}
+@keyframes gpulse{0%{transform:scale(.2);opacity:.9}100%{transform:scale(3.8);opacity:0}}
+.gbeat{transform-box:fill-box;transform-origin:center;animation:gbeat 1.6s ease-in-out infinite}
+@keyframes gbeat{50%{transform:scale(1.7)}}
+.sweep{transform-origin:230px 200px;animation:sw 5s linear infinite}
+@keyframes sw{to{transform:rotate(360deg)}}
+
+.scan{animation:scan 7s linear infinite}
+@keyframes scan{from{transform:translateY(-60px)}to{transform:translateY(440px)}}
+</style>
+<defs>
+<pattern id="dots" width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#1d232c"/></pattern>
+<linearGradient id="scanG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd23f" stop-opacity="0"/><stop offset=".5" stop-color="#ffd23f" stop-opacity=".045"/><stop offset="1" stop-color="#ffd23f" stop-opacity="0"/></linearGradient>
+<clipPath id="panel"><rect width="1000" height="380" rx="14"/></clipPath>
+</defs>
+<g clip-path="url(#panel)">
+<rect width="1000" height="380" fill="#0b0d10"/>
+<rect width="1000" height="380" fill="url(#dots)"/>
+
+<defs>
+  <clipPath id="globeClip"><circle cx="230" cy="200" r="145"/></clipPath>
+  <radialGradient id="globeShade" cx=".35" cy=".35" r=".75">
+    <stop offset="0" stop-color="#11151b" stop-opacity=".7"/>
+    <stop offset=".55" stop-color="#0b0d10" stop-opacity="0"/>
+    <stop offset="1" stop-color="#000" stop-opacity=".55"/>
+  </radialGradient>
+  <radialGradient id="globeGlow" cx=".5" cy=".5" r=".5">
+    <stop offset=".7" stop-color="#4c9aff" stop-opacity="0"/>
+    <stop offset="1" stop-color="#4c9aff" stop-opacity=".16"/>
+  </radialGradient>
+</defs>
+
+<!-- ambient glow around globe -->
+<circle cx="230" cy="200" r="190" fill="url(#globeGlow)"/>
+
+<!-- rotating orbit rings (dashed) -->
+<circle cx="230" cy="200" r="167" fill="none" stroke="#1d232c" stroke-width="1"
+        stroke-dasharray="2 7" class="orbit-cw" opacity=".55"/>
+<circle cx="230" cy="200" r="185" fill="none" stroke="#1d232c" stroke-width="1"
+        stroke-dasharray="1 9" class="orbit-ccw" opacity=".4"/>
+
+<!-- globe base fill -->
+<circle cx="230" cy="200" r="145" fill="#11151b"/>
+
+<!-- clipped globe interior -->
+<g clip-path="url(#globeClip)">
+  <!-- rotating meridians -->
+  <ellipse class="m0" cx="230" cy="200" rx="145" ry="145" fill="none" stroke="#1d232c" stroke-width="1.2" opacity=".75"/><ellipse class="m1" cx="230" cy="200" rx="145" ry="145" fill="none" stroke="#1d232c" stroke-width="1.2" opacity=".75"/><ellipse class="m2" cx="230" cy="200" rx="145" ry="145" fill="none" stroke="#1d232c" stroke-width="1.2" opacity=".75"/><ellipse class="m3" cx="230" cy="200" rx="145" ry="145" fill="none" stroke="#1d232c" stroke-width="1.2" opacity=".75"/><ellipse class="m4" cx="230" cy="200" rx="145" ry="145" fill="none" stroke="#1d232c" stroke-width="1.2" opacity=".75"/><ellipse class="m5" cx="230" cy="200" rx="145" ry="145" fill="none" stroke="#1d232c" stroke-width="1.2" opacity=".75"/><ellipse class="m6" cx="230" cy="200" rx="145" ry="145" fill="none" stroke="#1d232c" stroke-width="1.2" opacity=".75"/><ellipse class="m7" cx="230" cy="200" rx="145" ry="145" fill="none" stroke="#1d232c" stroke-width="1.2" opacity=".75"/>
+  <!-- static latitudes -->
+  <ellipse cx="230" cy="325.6" rx="145" ry="72.5" fill="none" stroke="#1d232c" stroke-width="1" opacity=".55"/><ellipse cx="230" cy="272.5" rx="145" ry="125.6" fill="none" stroke="#1d232c" stroke-width="1" opacity=".55"/><ellipse cx="230" cy="200.0" rx="145" ry="145.0" fill="none" stroke="#1d232c" stroke-width="1" opacity=".55"/><ellipse cx="230" cy="127.5" rx="145" ry="125.6" fill="none" stroke="#1d232c" stroke-width="1" opacity=".55"/><ellipse cx="230" cy="74.4" rx="145" ry="72.5" fill="none" stroke="#1d232c" stroke-width="1" opacity=".55"/>
+  <!-- equator highlight -->
+  <line x1="85" y1="200" x2="375" y2="200" stroke="#ffd23f" stroke-width="1"
+        opacity=".4" stroke-dasharray="4 4"/>
+  <!-- 3D shading (fixed lighting from upper-left) -->
+  <circle cx="230" cy="200" r="145" fill="url(#globeShade)"/>
+  <!-- signal arcs between stations -->
+  <path d="M150,145 Q215.0,80 280,115" fill="none" stroke="#ffd23f" stroke-width="1.2" stroke-dasharray="3 4" opacity=".4"/><path d="M280,115 Q302.5,80 325,205" fill="none" stroke="#ffd23f" stroke-width="1.2" stroke-dasharray="3 4" opacity=".4"/><path d="M325,205 Q260.0,170 195,290" fill="none" stroke="#ffd23f" stroke-width="1.2" stroke-dasharray="3 4" opacity=".4"/><path d="M195,290 Q227.5,255 260,310" fill="none" stroke="#ffd23f" stroke-width="1.2" stroke-dasharray="3 4" opacity=".4"/><path d="M260,310 Q205.0,110 150,145" fill="none" stroke="#ffd23f" stroke-width="1.2" stroke-dasharray="3 4" opacity=".4"/>
+  <!-- station markers (dots + pulse rings only; labels drawn outside clip) -->
+  <circle cx="150" cy="145" r="14" fill="none" stroke="#4c9aff" stroke-width="1" class="gpulse" style="animation-delay:0.0s"/><circle cx="150" cy="145" r="3.5" fill="#4c9aff" class="gbeat" style="animation-delay:0.0s"/><circle cx="280" cy="115" r="14" fill="none" stroke="#5cff9d" stroke-width="1" class="gpulse" style="animation-delay:0.45s"/><circle cx="280" cy="115" r="3.5" fill="#5cff9d" class="gbeat" style="animation-delay:0.45s"/><circle cx="325" cy="205" r="14" fill="none" stroke="#ffd23f" stroke-width="1" class="gpulse" style="animation-delay:0.9s"/><circle cx="325" cy="205" r="3.5" fill="#ffd23f" class="gbeat" style="animation-delay:0.9s"/><circle cx="195" cy="290" r="14" fill="none" stroke="#ff5c6c" stroke-width="1" class="gpulse" style="animation-delay:1.35s"/><circle cx="195" cy="290" r="3.5" fill="#ff5c6c" class="gbeat" style="animation-delay:1.35s"/><circle cx="260" cy="310" r="14" fill="none" stroke="#b28cff" stroke-width="1" class="gpulse" style="animation-delay:1.8s"/><circle cx="260" cy="310" r="3.5" fill="#b28cff" class="gbeat" style="animation-delay:1.8s"/>
+</g>
+
+<!-- radar sweep (rotating sector, clipped to globe) -->
+<g clip-path="url(#globeClip)">
+  <g class="sweep">
+    <path d="M230,200 L230,55 A145,145 0 0 1 375.0,200.0 Z"
+          fill="#ffd23f" opacity=".14"/>
+  </g>
+</g>
+
+<!-- globe outline -->
+<circle cx="230" cy="200" r="145" fill="none" stroke="#1d232c" stroke-width="1.5"/>
+
+<!-- station labels (drawn after globe outline so they sit on top) -->
+<text x="160" y="149" font-size="10" text-anchor="start" fill="#4c9aff">us-east-1</text><text x="270" y="119" font-size="10" text-anchor="end" fill="#5cff9d">eu-west-1</text><text x="315" y="209" font-size="10" text-anchor="end" fill="#ffd23f">ap-south-1</text><text x="205" y="294" font-size="10" text-anchor="start" fill="#ff5c6c">sa-east-1</text><text x="250" y="314" font-size="10" text-anchor="end" fill="#b28cff">af-central</text>
+
+<!-- satellite on outer orbit (drawn on top so it never disappears) -->
+<g class="sat-orbit">
+  <circle cx="415" cy="200" r="6" fill="none" stroke="#ffd23f" stroke-width="1" opacity=".5"/>
+  <circle cx="415" cy="200" r="3" fill="#ffd23f"/>
+</g>
+
+<!-- cardinal crosshair markers -->
+<line x1="77" y1="200" x2="83" y2="200" stroke="#4a5361" stroke-width="1"/>
+<line x1="377" y1="200" x2="383" y2="200" stroke="#4a5361" stroke-width="1"/>
+<line x1="230" y1="47" x2="230" y2="53" stroke="#4a5361" stroke-width="1"/>
+<line x1="230" y1="347" x2="230" y2="353" stroke="#4a5361" stroke-width="1"/>
+
+<!-- title bar -->
+<text x="30" y="40" font-size="12" class="m">// global signal mesh</text>
+<text x="970" y="40" text-anchor="end" font-size="12" class="m">5 nodes · live</text>
+
+<!-- log panel header -->
+<circle cx="475" cy="56" r="3" fill="#5cff9d" class="gbeat" style="animation-delay:0s"/>
+<text x="485" y="60" font-size="12" class="m">SIGNAL LOG</text>
+<line x1="470" y1="68" x2="952" y2="68" stroke="#1d232c"/>
+
+<g class="in" style="animation-delay:0.40s"><text x="470" y="78" font-size="11" class="m">[ SIG]</text><text x="514" y="78" font-size="13" class="t">us-east-1 → stryker-relay</text><text x="952" y="78" text-anchor="end" font-size="12" font-weight="700" fill="#5cff9d">OK</text></g><g class="in" style="animation-delay:0.52s"><text x="470" y="101" font-size="11" class="m">[ SIG]</text><text x="514" y="101" font-size="13" class="t">eu-west-1 → llm-router</text><text x="952" y="101" text-anchor="end" font-size="12" font-weight="700" fill="#5cff9d">OK</text></g><g class="in" style="animation-delay:0.64s"><text x="470" y="124" font-size="11" class="m">[ SIG]</text><text x="514" y="124" font-size="13" class="t">ap-south-1 → postgres-ha</text><text x="952" y="124" text-anchor="end" font-size="12" font-weight="700" fill="#5cff9d">OK</text></g><g class="in" style="animation-delay:0.76s"><text x="470" y="147" font-size="11" class="m">[ SIG]</text><text x="514" y="147" font-size="13" class="t">sa-east-1 → redis-cluster</text><text x="952" y="147" text-anchor="end" font-size="12" font-weight="700" fill="#5cff9d">OK</text></g><g class="in" style="animation-delay:0.88s"><text x="470" y="170" font-size="11" class="m">[ SIG]</text><text x="514" y="170" font-size="13" class="t">af-central → rabbitmq</text><text x="952" y="170" text-anchor="end" font-size="12" font-weight="700" fill="#ffd23f">WARN</text></g><g class="in" style="animation-delay:1.00s"><text x="470" y="193" font-size="11" class="m">[ RTT]</text><text x="514" y="193" font-size="13" class="t">stryker-relay rtt=12ms</text><text x="952" y="193" text-anchor="end" font-size="12" font-weight="700" fill="#4c9aff"></text></g><g class="in" style="animation-delay:1.12s"><text x="470" y="216" font-size="11" class="m">[ RTT]</text><text x="514" y="216" font-size="13" class="t">llm-router rtt=8ms</text><text x="952" y="216" text-anchor="end" font-size="12" font-weight="700" fill="#4c9aff"></text></g><g class="in" style="animation-delay:1.24s"><text x="470" y="239" font-size="11" class="m">[ RTT]</text><text x="514" y="239" font-size="13" class="t">postgres-ha rtt=23ms</text><text x="952" y="239" text-anchor="end" font-size="12" font-weight="700" fill="#4c9aff"></text></g><g class="in" style="animation-delay:1.36s"><text x="470" y="262" font-size="11" class="m">[ RTT]</text><text x="514" y="262" font-size="13" class="t">redis-cluster rtt=4ms</text><text x="952" y="262" text-anchor="end" font-size="12" font-weight="700" fill="#4c9aff"></text></g><g class="in" style="animation-delay:1.48s"><text x="470" y="285" font-size="11" class="m">[SYNC]</text><text x="514" y="285" font-size="13" class="t">kernel 7.2-um-arm64 synced</text><text x="952" y="285" text-anchor="end" font-size="12" font-weight="700" fill="#5cff9d">OK</text></g>
+
+<!-- prompt cursor -->
+<g class="in" style="animation-delay:1.90s">
+  <text x="34" y="322" font-size="13">
+    <tspan class="g">mesh@earth</tspan><tspan class="m">:</tspan><tspan class="b">~</tspan><tspan class="m">$ </tspan>
+    <tspan class="t">watch -n1 signal status</tspan>
+  </text>
+  <rect x="226" y="310" width="9" height="14" class="y blink"/>
+</g>
+
+<rect class="scan" x="0" y="0" width="1000" height="60" fill="url(#scanG)"/>
+</g>
+<rect x=".5" y=".5" width="999" height="379" rx="14" fill="none" stroke="#1d232c"/>
+</svg>

@@ -1,0 +1,519 @@
+#!/usr/bin/env python3
+"""
+Renders every SVG under assets/ for the HexFoc-Xp profile README.
+    python3 scripts/build.py
+Edit the text/numbers below and re-run. No dependencies.
+"""
+import math, random
+from html import escape
+from pathlib import Path
+
+OUT = Path(__file__).resolve().parent.parent / "assets"
+
+# ── palette ────────────────────────────────────────────────────────────────
+BG, BG2, LINE = "#0b0d10", "#11151b", "#1d232c"
+TXT, DIM, MUTE = "#d7dde5", "#7b8594", "#4a5361"
+YEL, BLU, GRN, RED, VIO = "#ffd23f", "#4c9aff", "#5cff9d", "#ff5c6c", "#b28cff"
+MONO = ("ui-monospace,'JetBrains Mono','Fira Code','Cascadia Code',SFMono-Regular,"
+        "Menlo,Consolas,'Liberation Mono',monospace")
+
+BASE_CSS = f"""
+text{{font-family:{MONO};}}
+.t{{fill:{TXT}}} .d{{fill:{DIM}}} .m{{fill:{MUTE}}}
+.y{{fill:{YEL}}} .b{{fill:{BLU}}} .g{{fill:{GRN}}} .r{{fill:{RED}}} .v{{fill:{VIO}}}
+.in{{opacity:0;animation:in .01s linear forwards}}
+@keyframes in{{to{{opacity:1}}}}
+.blink{{animation:blink 1.05s steps(1) infinite}}
+@keyframes blink{{50%{{opacity:0}}}}
+"""
+
+
+def frame(w, h, body, css="", r=14):
+    """Dark rounded panel with a faint dot grid and a slow scanline."""
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}">
+<style>{BASE_CSS}{css}
+.scan{{animation:scan 7s linear infinite}}
+@keyframes scan{{from{{transform:translateY(-60px)}}to{{transform:translateY({h+60}px)}}}}
+</style>
+<defs>
+<pattern id="dots" width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="{LINE}"/></pattern>
+<linearGradient id="scanG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{YEL}" stop-opacity="0"/><stop offset=".5" stop-color="{YEL}" stop-opacity=".045"/><stop offset="1" stop-color="{YEL}" stop-opacity="0"/></linearGradient>
+<clipPath id="panel"><rect width="{w}" height="{h}" rx="{r}"/></clipPath>
+</defs>
+<g clip-path="url(#panel)">
+<rect width="{w}" height="{h}" fill="{BG}"/>
+<rect width="{w}" height="{h}" fill="url(#dots)"/>
+{body}
+<rect class="scan" x="0" y="0" width="{w}" height="60" fill="url(#scanG)"/>
+</g>
+<rect x=".5" y=".5" width="{w-1}" height="{h-1}" rx="{r}" fill="none" stroke="{LINE}"/>
+</svg>"""
+
+
+def chrome(w, title):
+    return f"""<rect width="{w}" height="34" fill="{BG2}"/><line x1="0" y1="34" x2="{w}" y2="34" stroke="{LINE}"/>
+<circle cx="20" cy="17" r="5" fill="{RED}" opacity=".8"/><circle cx="38" cy="17" r="5" fill="{YEL}" opacity=".8"/><circle cx="56" cy="17" r="5" fill="{GRN}" opacity=".8"/>
+<text x="{w/2}" y="21.5" text-anchor="middle" font-size="12" class="m">{escape(title)}</text>"""
+
+
+# ── 1. hero ────────────────────────────────────────────────────────────────
+def hero():
+    W, H = 1000, 300
+    rnd = random.Random(36911)
+    bars, n = [], 96
+    for i in range(n):
+        x = 10 + i * (W - 20) / n
+        hmax = 30 + 150 * (0.5 + 0.5 * math.sin(i / 7.0)) * rnd.uniform(.55, 1)
+        col = YEL if i % 11 == 0 else (BLU if i % 3 else "#2b3a55")
+        bars.append(f'<rect x="{x:.1f}" y="{H-hmax:.1f}" width="{(W-20)/n-3:.1f}" height="{hmax:.1f}" fill="{col}" opacity=".26" '
+                    f'style="transform-origin:{x:.1f}px {H}px;animation:eq {rnd.uniform(.7,2.2):.2f}s ease-in-out {-rnd.uniform(0,2):.2f}s infinite alternate"/>')
+    css = """
+@keyframes eq{from{transform:scaleY(.12)}to{transform:scaleY(1)}}
+.name{font-size:104px;font-weight:800}
+.gl1{animation:g1 5s steps(1) infinite} .gl2{animation:g2 5s steps(1) infinite}
+@keyframes g1{0%,88%,100%{transform:translate(0,0);opacity:0}89%{transform:translate(-7px,2px);opacity:.9}91%{transform:translate(5px,-3px);opacity:.9}93%{transform:translate(-2px,0);opacity:.9}95%{opacity:0}}
+@keyframes g2{0%,88%,100%{transform:translate(0,0);opacity:0}89%{transform:translate(6px,-2px);opacity:.9}91%{transform:translate(-5px,3px);opacity:.9}93%{transform:translate(3px,1px);opacity:.9}95%{opacity:0}}
+.rise{opacity:0;animation:rise .9s cubic-bezier(.2,.8,.2,1) .15s forwards}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.sub{opacity:0;animation:rise .8s ease .7s forwards}
+.cyc text{opacity:0;animation:cyc 16s infinite}
+@keyframes cyc{0%{opacity:0}2%,23%{opacity:1}25%,100%{opacity:0}}
+"""
+    roles = ["boots a real Linux kernel inside an Android app",
+             "built Stryker — the pentest lab in 150K+ pockets",
+             "first public WhisperPair PoC, ~12h after disclosure",
+             "architects AI backends at millions-of-users scale"]
+    cyc = "".join(f'<text x="80" y="236" font-size="17" class="t" style="animation-delay:{i*4}s">'
+                  f'<tspan class="y">&gt; </tspan>{escape(r)}</text>' for i, r in enumerate(roles))
+    name = lambda cls: f'<text x="74" y="170" class="name {cls}" textLength="560" lengthAdjust="spacingAndGlyphs">HexFoc-Xp</text>'
+    cursor_x = 642  # x-position of the cursor block (name start + textLength + 8)
+    # Indonesian flag emoji next to the name — rendered as plain text so the
+    # browser/GitHub's emoji font handles it. Subtle, recognizable, no SVG art.
+    flag = f'<text x="{cursor_x + 28}" y="170" font-size="56" class="rise">🇮🇩</text>'
+    body = f"""
+<g>{''.join(bars)}</g>
+<defs><linearGradient id="fade" x1="0" x2="1"><stop offset="0" stop-color="{BG}" stop-opacity=".95"/><stop offset=".65" stop-color="{BG}" stop-opacity=".45"/><stop offset="1" stop-color="{BG}" stop-opacity=".05"/></linearGradient></defs>
+<rect width="{W}" height="{H}" fill="url(#fade)"/>
+<text x="80" y="62" font-size="13" class="m sub">// android · kernel · offensive security · backend</text>
+<g class="rise">{name('b gl1')}{name('y gl2')}{name('t')}
+  <rect x="{cursor_x}" y="96" width="14" height="76" class="y blink"/></g>
+{flag}
+<g class="cyc">{cyc}</g>
+"""
+    return frame(W, H, body, css)
+
+
+# ── 2. impact: odometer counters ──────────────────────────────────────────
+def impact():
+    W, H = 1000, 184
+    tiles = [
+        ("150K+", "installs", "Stryker · Android pentest", YEL),
+        ("1.8k★", "GitHub stars", "strykerapp · GPLv3", YEL),
+        ("~3s", "phone → dockerd", "linux-um-arm64 · no root", GRN),
+        ("12h", "disclosure → public PoC", "CVE-2025-36911", RED),
+    ]
+    PAD, GAP = 24, 14
+    tw = (W - 2 * PAD - 3 * GAP) / 4
+    th = 136
+    FS, CW, LH = 54, 32.6, 64
+    css = """
+.roll{animation:roll 1.8s cubic-bezier(.15,.85,.25,1) both}
+@keyframes roll{from{transform:translateY(0)}}
+.tile{opacity:0;animation:tin .6s ease both}
+@keyframes tin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+"""
+    out, clips = [], []
+    for i, (val, label, cap, col) in enumerate(tiles):
+        cx, cy = PAD + i * (tw + GAP), 24
+        base = cy + 74
+        d0 = 0.2 + i * 0.12
+        clips.append(f'<clipPath id="c{i}"><rect x="{cx}" y="{base-FS+4}" width="{tw}" height="{FS+2}"/></clipPath>')
+        chars = []
+        for k, ch in enumerate(val):
+            x = cx + 22 + k * CW
+            if ch.isdigit():
+                dgt = int(ch)
+                steps = 10 * (1 + min(k, 2)) + dgt  # later digits spin longer, always land on dgt
+                col_txt = "".join(f'<text x="{x:.1f}" y="{base + j*LH}" font-size="{FS}" font-weight="800" fill="{col}">{j % 10}</text>'
+                                  for j in range(steps + 1))
+                chars.append(f'<g style="transform:translateY({-steps*LH}px);animation-delay:{d0+.15+k*.08:.2f}s" class="roll">{col_txt}</g>')
+            else:
+                chars.append(f'<text x="{x:.1f}" y="{base}" font-size="{FS}" font-weight="800" fill="{col}">{escape(ch)}</text>')
+        out.append(
+            f'<g class="tile" style="animation-delay:{d0:.2f}s">'
+            f'<rect x="{cx}" y="{cy}" width="{tw:.1f}" height="{th}" rx="10" fill="{BG2}" stroke="{LINE}"/>'
+            f'<rect x="{cx}" y="{cy+16}" width="3" height="{th-32}" fill="{col}"/>'
+            f'<g clip-path="url(#c{i})">{"".join(chars)}</g>'
+            f'<text x="{cx+22}" y="{base+26}" font-size="14" class="t">{escape(label)}</text>'
+            f'<text x="{cx+22}" y="{base+47}" font-size="12" class="m">{escape(cap)}</text></g>')
+    body = f'<defs>{"".join(clips)}</defs>' + "".join(out)
+    return frame(W, H, body, css)
+
+
+# ── 3. dmesg boot log ─────────────────────────────────────────────────────
+def boot():
+    W = 1000
+    lines = [
+        ("0.000000", "t", "Linux version 7.2-HexFoc-Xp (ARCH=um SUBARCH=arm64) — booting as a user process", None),
+        ("0.003117", "t", "cpu0: Indonesian 🇮🇩 · fluent in C, Java, Kotlin, Python", None),
+        ("0.017702", "t", "stryker: rooted-Android pentest suite · 150K+ installs · nmap/msf/BLE/HID on-device", "g"),
+        ("0.031000", "t", "stryker: open-sourced under GPLv3 — free, community-driven", "g"),
+        ("0.064400", "t", "um-arm64: ported User-Mode Linux to aarch64 · Debian + Docker on an unrooted phone", "g"),
+        ("0.071200", "t", "um-arm64: SMP, loadable modules, USB devices handed to real kernel drivers", "g"),
+        ("0.077300", "t", "um-arm64: RFC posted to linux-um · upstream reception: \"Nice :-)\"", "g"),
+        ("0.081900", "t", "phantomlink: wlan9 registered (ath9k_htc) — device is not actually here", "y"),
+        ("0.093100", "t", "whisperpair: shipped first public PoC ~12h after partial disclosure", "g"),
+        ("0.102300", "t", "backend: architect · FastAPI · Postgres HA · RabbitMQ · ClickHouse · LangGraph", "g"),
+        ("0.224001", "y", "Run /sbin/magic as init process", None),
+    ]
+    LH, y0 = 25, 66
+    H = y0 + LH * (len(lines) + 1) + 26
+    rows, t = [], 0.35
+    for i, (ts, cls, msg, tag) in enumerate(lines):
+        y = y0 + i * LH
+        if tag:
+            label = "  OK  " if tag == "g" else " WARN "
+            badge = (f'<text x="34" y="{y}" font-size="13.5" class="m">[</text>'
+                     f'<text x="42" y="{y}" font-size="13.5" class="{tag}" font-weight="700" xml:space="preserve">{label}</text>'
+                     f'<text x="93" y="{y}" font-size="13.5" class="m">]</text>')
+        else:
+            badge = f'<text x="34" y="{y}" font-size="13.5" class="m">[ ···· ]</text>'
+        rows.append(f'<g class="in" style="animation-delay:{t:.2f}s">{badge}'
+                    f'<text x="112" y="{y}" font-size="13.5" class="d">[{ts:>12}]</text>'
+                    f'<text x="240" y="{y}" font-size="13.5" class="{cls}">{escape(msg)}</text></g>')
+        t += 0.16 + (0.25 if i in (1, 3, 6) else 0)
+    py = y0 + len(lines) * LH + 8
+    cmd = "whoami"
+    typed = "".join(f'<tspan class="in" style="animation-delay:{t+0.3+k*0.09:.2f}s">{c}</tspan>' for k, c in enumerate(cmd))
+    out_t = t + 0.3 + len(cmd) * 0.09 + 0.35
+    answer = "someone who makes hardware-shaped problems run in userspace."
+    rows.append(f'<g class="in" style="animation-delay:{t:.2f}s"><text x="34" y="{py}" font-size="14.5">'
+                f'<tspan class="g">magic@phone</tspan><tspan class="m">:</tspan><tspan class="b">~</tspan><tspan class="m">$ </tspan>'
+                f'<tspan class="t">{typed}</tspan></text></g>')
+    rows.append(f'<g class="in" style="animation-delay:{out_t:.2f}s"><text x="34" y="{py+LH}" font-size="14.5" class="y">{answer}</text>'
+                f'<rect x="{34+(len(answer)+1)*8.75:.0f}" y="{py+LH-13}" width="9" height="17" class="t blink"/></g>')
+    return frame(W, H, chrome(W, "dmesg  ·  HexFoc-Xp@aarch64") + "".join(rows))
+
+
+# ── 4. matryoshka ─────────────────────────────────────────────────────────
+def matryoshka():
+    W, H = 1000, 380
+    cx, cy = 210, 200
+    layers = [
+        ("Android app", "unrooted phone · plain untrusted_app", BLU),
+        ("Linux 7.2 kernel", "ARCH=um SUBARCH=arm64 · runs as a process", YEL),
+        ("Debian 12", "boots to dockerd in ~3 seconds", GRN),
+        ("dockerd", "overlay2 · cgroup v2 · real kernel drivers", VIO),
+        ("container", "pulled, started, port-forwarded to the phone", BLU),
+        ("minecraft", "yes, really.", RED),
+    ]
+    css = """
+.sq{fill:none;stroke-width:2;opacity:0;transform-box:fill-box;transform-origin:center;animation:pop .55s cubic-bezier(.2,1.4,.4,1) forwards}
+@keyframes pop{from{opacity:0;transform:scale(1.25)}to{opacity:1;transform:scale(1)}}
+.core{transform-box:fill-box;transform-origin:center;animation:beat 1.6s ease-in-out 3.6s infinite}
+@keyframes beat{50%{transform:scale(1.35)}}
+.spin{transform-origin:210px 200px;animation:spin 40s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+"""
+    g = []
+    for i, (name, sub, col) in enumerate(layers):
+        s = 300 - i * 50
+        delay = 0.3 + i * 0.45
+        g.append(f'<rect class="sq" x="{cx-s/2}" y="{cy-s/2}" width="{s}" height="{s}" rx="{26-i*3}" stroke="{col}" style="animation-delay:{delay:.2f}s"/>')
+        ly = 82 + i * 47
+        g.append(f'<g class="in" style="animation-delay:{delay+.2:.2f}s">'
+                 f'<line x1="{cx+s/2-6}" y1="{cy-s/2+10}" x2="455" y2="{ly-5}" stroke="{col}" stroke-dasharray="4 4"/>'
+                 f'<circle cx="{cx+s/2-6}" cy="{cy-s/2+10}" r="3" fill="{col}"/>'
+                 f'<text x="470" y="{ly}" font-size="17" font-weight="700" fill="{col}">{escape(name)}</text>'
+                 f'<text x="470" y="{ly+19}" font-size="13" class="d">{escape(sub)}</text></g>')
+    g.append(f'<circle class="core in" cx="{cx}" cy="{cy}" r="7" fill="{RED}" style="animation-delay:3s"/>')
+    ring = f'<circle class="spin" cx="{cx}" cy="{cy}" r="172" fill="none" stroke="{LINE}" stroke-dasharray="2 9"/>'
+    title = (f'<text x="{W-40}" y="40" text-anchor="end" font-size="12" class="m">how deep does it go?</text>'
+             '')
+    return frame(W, H, ring + "".join(g) + title, css)
+
+
+# ── 5. globe: rotating wireframe + live signal mesh ───────────────────────
+def globe():
+    """Rotating wireframe globe with a live signal mesh overlay."""
+    W, H = 1000, 380
+    cx, cy = 230, 200
+    R = 145
+    N_MERID = 8
+    T_ROT = 16  # seconds for one full rotation
+
+    # ── rotating meridians ───────────────────────────────────────────────
+    # Each meridian is a full circle (rx=ry=R); CSS scaleX animation squeezes
+    # it horizontally to simulate a meridian rotating around the polar axis.
+    # scaleX(α) with α = sin(λ_i + 2πt/T) gives rx_vis = R·|sin(λ_i + 2πt/T)|
+    # — exactly the orthographic projection of a meridian at longitude λ_i.
+    meridian_css, meridians_svg = [], []
+    for i in range(N_MERID):
+        offset = i * T_ROT / (2 * N_MERID)  # phase offset = (i·π/N) / (2π/T)
+        meridian_css.append(
+            f'.m{i}{{transform-box:fill-box;transform-origin:center;'
+            f'animation:mrot {T_ROT}s linear infinite;animation-delay:-{offset:.3f}s}}'
+        )
+        meridians_svg.append(
+            f'<ellipse class="m{i}" cx="{cx}" cy="{cy}" rx="{R}" ry="{R}" '
+            f'fill="none" stroke="{LINE}" stroke-width="1.2" opacity=".75"/>'
+        )
+
+    # ── static latitude lines (clipped to globe) ─────────────────────────
+    lats = []
+    for lat_deg in [-60, -30, 0, 30, 60]:
+        ry = R * math.cos(math.radians(lat_deg))
+        y_off = R * math.sin(math.radians(lat_deg))
+        if ry < 1: ry = 1
+        lats.append(
+            f'<ellipse cx="{cx}" cy="{cy - y_off:.1f}" rx="{R}" ry="{ry:.1f}" '
+            f'fill="none" stroke="{LINE}" stroke-width="1" opacity=".55"/>'
+        )
+
+    # ── surface stations (signal endpoints on the visible hemisphere) ────
+    stations = [
+        (cx -  80, cy -  55, BLU, "us-east-1",   "12ms"),
+        (cx +  50, cy -  85, GRN, "eu-west-1",    "8ms"),
+        (cx +  95, cy +   5, YEL, "ap-south-1", "23ms"),
+        (cx -  35, cy +  90, RED, "sa-east-1",  "47ms"),
+        (cx +  30, cy + 110, VIO, "af-central",  "31ms"),
+    ]
+
+    # signal arcs (curved paths above surface between consecutive stations)
+    arcs_svg = []
+    for i in range(len(stations)):
+        x1, y1, *_ = stations[i]
+        x2, y2, *_ = stations[(i + 1) % len(stations)]
+        mx, my = (x1 + x2) / 2, min(y1, y2) - 35
+        arcs_svg.append(
+            f'<path d="M{x1},{y1} Q{mx},{my} {x2},{y2}" fill="none" stroke="{YEL}" '
+            f'stroke-width="1.2" stroke-dasharray="3 4" opacity=".4"/>'
+        )
+
+    # station markers (pulse ring + dot + label)
+    # Dots & pulse rings are clipped to globe; labels go outside so they
+    # never get cut off when the station is near the limb.
+    stations_inside = []
+    stations_outside = []
+    for i, (px, py, col, name, _ping) in enumerate(stations):
+        delay = i * 0.45
+        stations_inside.append(
+            f'<circle cx="{px}" cy="{py}" r="14" fill="none" stroke="{col}" stroke-width="1" '
+            f'class="gpulse" style="animation-delay:{delay}s"/>'
+            f'<circle cx="{px}" cy="{py}" r="3.5" fill="{col}" class="gbeat" style="animation-delay:{delay}s"/>'
+        )
+        # If the station is on the right half, put the label to its left
+        # so it never runs past the globe's right limb.
+        if px > cx:
+            label_anchor = px - 10
+            label_align = "end"
+        else:
+            label_anchor = px + 10
+            label_align = "start"
+        stations_outside.append(
+            f'<text x="{label_anchor}" y="{py+4}" font-size="10" text-anchor="{label_align}" fill="{col}">{escape(name)}</text>'
+        )
+
+    # ── right panel: live signal log ─────────────────────────────────────
+    log_x, log_y0, log_lh = 470, 78, 23
+    log_entries = [
+        ("SIG",  "us-east-1 → stryker-relay",  "OK",   GRN),
+        ("SIG",  "eu-west-1 → llm-router",     "OK",   GRN),
+        ("SIG",  "ap-south-1 → postgres-ha",   "OK",   GRN),
+        ("SIG",  "sa-east-1 → redis-cluster",  "OK",   GRN),
+        ("SIG",  "af-central → rabbitmq",       "WARN", YEL),
+        ("RTT",  "stryker-relay rtt=12ms",      "",     BLU),
+        ("RTT",  "llm-router rtt=8ms",          "",     BLU),
+        ("RTT",  "postgres-ha rtt=23ms",         "",     BLU),
+        ("RTT",  "redis-cluster rtt=4ms",       "",     BLU),
+        ("SYNC", "kernel 7.2-um-arm64 synced",  "OK",   GRN),
+    ]
+    log_svg = []
+    for i, (tag, msg, status, col) in enumerate(log_entries):
+        y = log_y0 + i * log_lh
+        delay = 0.4 + i * 0.12
+        log_svg.append(
+            f'<g class="in" style="animation-delay:{delay:.2f}s">'
+            f'<text x="{log_x}" y="{y}" font-size="11" class="m">[{tag:>4}]</text>'
+            f'<text x="{log_x+44}" y="{y}" font-size="13" class="t">{escape(msg)}</text>'
+            f'<text x="952" y="{y}" text-anchor="end" font-size="12" font-weight="700" fill="{col}">{status}</text>'
+            f'</g>'
+        )
+    live_t = 0.4 + len(log_entries) * 0.12 + 0.3
+
+    body = f"""
+<defs>
+  <clipPath id="globeClip"><circle cx="{cx}" cy="{cy}" r="{R}"/></clipPath>
+  <radialGradient id="globeShade" cx=".35" cy=".35" r=".75">
+    <stop offset="0" stop-color="{BG2}" stop-opacity=".7"/>
+    <stop offset=".55" stop-color="{BG}" stop-opacity="0"/>
+    <stop offset="1" stop-color="#000" stop-opacity=".55"/>
+  </radialGradient>
+  <radialGradient id="globeGlow" cx=".5" cy=".5" r=".5">
+    <stop offset=".7" stop-color="{BLU}" stop-opacity="0"/>
+    <stop offset="1" stop-color="{BLU}" stop-opacity=".16"/>
+  </radialGradient>
+</defs>
+
+<!-- ambient glow around globe -->
+<circle cx="{cx}" cy="{cy}" r="{R+45}" fill="url(#globeGlow)"/>
+
+<!-- rotating orbit rings (dashed) -->
+<circle cx="{cx}" cy="{cy}" r="{R+22}" fill="none" stroke="{LINE}" stroke-width="1"
+        stroke-dasharray="2 7" class="orbit-cw" opacity=".55"/>
+<circle cx="{cx}" cy="{cy}" r="{R+40}" fill="none" stroke="{LINE}" stroke-width="1"
+        stroke-dasharray="1 9" class="orbit-ccw" opacity=".4"/>
+
+<!-- globe base fill -->
+<circle cx="{cx}" cy="{cy}" r="{R}" fill="{BG2}"/>
+
+<!-- clipped globe interior -->
+<g clip-path="url(#globeClip)">
+  <!-- rotating meridians -->
+  {''.join(meridians_svg)}
+  <!-- static latitudes -->
+  {''.join(lats)}
+  <!-- equator highlight -->
+  <line x1="{cx-R}" y1="{cy}" x2="{cx+R}" y2="{cy}" stroke="{YEL}" stroke-width="1"
+        opacity=".4" stroke-dasharray="4 4"/>
+  <!-- 3D shading (fixed lighting from upper-left) -->
+  <circle cx="{cx}" cy="{cy}" r="{R}" fill="url(#globeShade)"/>
+  <!-- signal arcs between stations -->
+  {''.join(arcs_svg)}
+  <!-- station markers (dots + pulse rings only; labels drawn outside clip) -->
+  {''.join(stations_inside)}
+</g>
+
+<!-- radar sweep (rotating sector, clipped to globe) -->
+<g clip-path="url(#globeClip)">
+  <g class="sweep">
+    <path d="M{cx},{cy} L{cx},{cy-R} A{R},{R} 0 0 1 {cx+R:.1f},{cy:.1f} Z"
+          fill="{YEL}" opacity=".14"/>
+  </g>
+</g>
+
+<!-- globe outline -->
+<circle cx="{cx}" cy="{cy}" r="{R}" fill="none" stroke="{LINE}" stroke-width="1.5"/>
+
+<!-- station labels (drawn after globe outline so they sit on top) -->
+{''.join(stations_outside)}
+
+<!-- satellite on outer orbit (drawn on top so it never disappears) -->
+<g class="sat-orbit">
+  <circle cx="{cx+R+40}" cy="{cy}" r="6" fill="none" stroke="{YEL}" stroke-width="1" opacity=".5"/>
+  <circle cx="{cx+R+40}" cy="{cy}" r="3" fill="{YEL}"/>
+</g>
+
+<!-- cardinal crosshair markers -->
+<line x1="{cx-R-8}" y1="{cy}" x2="{cx-R-2}" y2="{cy}" stroke="{MUTE}" stroke-width="1"/>
+<line x1="{cx+R+2}" y1="{cy}" x2="{cx+R+8}" y2="{cy}" stroke="{MUTE}" stroke-width="1"/>
+<line x1="{cx}" y1="{cy-R-8}" x2="{cx}" y2="{cy-R-2}" stroke="{MUTE}" stroke-width="1"/>
+<line x1="{cx}" y1="{cy+R+2}" x2="{cx}" y2="{cy+R+8}" stroke="{MUTE}" stroke-width="1"/>
+
+<!-- title bar -->
+<text x="30" y="40" font-size="12" class="m">// global signal mesh</text>
+<text x="{W-30}" y="40" text-anchor="end" font-size="12" class="m">5 nodes · live</text>
+
+<!-- log panel header -->
+<circle cx="{log_x+5}" cy="{log_y0-22}" r="3" fill="{GRN}" class="gbeat" style="animation-delay:0s"/>
+<text x="{log_x+15}" y="{log_y0-18}" font-size="12" class="m">SIGNAL LOG</text>
+<line x1="{log_x}" y1="{log_y0-10}" x2="952" y2="{log_y0-10}" stroke="{LINE}"/>
+
+{''.join(log_svg)}
+
+<!-- prompt cursor -->
+<g class="in" style="animation-delay:{live_t:.2f}s">
+  <text x="34" y="{log_y0 + len(log_entries)*log_lh + 14}" font-size="13">
+    <tspan class="g">mesh@earth</tspan><tspan class="m">:</tspan><tspan class="b">~</tspan><tspan class="m">$ </tspan>
+    <tspan class="t">watch -n1 signal status</tspan>
+  </text>
+  <rect x="{34 + 24*8}" y="{log_y0 + len(log_entries)*log_lh + 2}" width="9" height="14" class="y blink"/>
+</g>
+"""
+
+    css = "\n".join(meridian_css) + f"""
+@keyframes mrot{{0%{{transform:scaleX(0)}}25%{{transform:scaleX(1)}}50%{{transform:scaleX(0)}}75%{{transform:scaleX(-1)}}100%{{transform:scaleX(0)}}}}
+.orbit-cw{{transform-origin:{cx}px {cy}px;animation:ocw 18s linear infinite}}
+@keyframes ocw{{to{{transform:rotate(360deg)}}}}
+.orbit-ccw{{transform-origin:{cx}px {cy}px;animation:occw 26s linear infinite}}
+@keyframes occw{{to{{transform:rotate(-360deg)}}}}
+.sat-orbit{{transform-origin:{cx}px {cy}px;animation:ocw 22s linear infinite}}
+.gpulse{{transform-box:fill-box;transform-origin:center;animation:gpulse 2.6s ease-out infinite}}
+@keyframes gpulse{{0%{{transform:scale(.2);opacity:.9}}100%{{transform:scale(3.8);opacity:0}}}}
+.gbeat{{transform-box:fill-box;transform-origin:center;animation:gbeat 1.6s ease-in-out infinite}}
+@keyframes gbeat{{50%{{transform:scale(1.7)}}}}
+.sweep{{transform-origin:{cx}px {cy}px;animation:sw 5s linear infinite}}
+@keyframes sw{{to{{transform:rotate(360deg)}}}}
+"""
+    return frame(W, H, body, css)
+
+
+# ── 6. lsmod: the stack ───────────────────────────────────────────────────
+def lsmod():
+    mods = [
+        ("c", "arch_um,ld_preload,af_packet", "systems", RED),
+        ("android_ndk", "bionic,jni,usb_host", "mobile", YEL),
+        ("java", "stryker", "mobile", YEL),
+        ("kotlin", "wpair,umarm", "mobile", YEL),
+        ("python", "fastapi,langgraph,celery", "backend", BLU),
+        ("fastapi", "api_gateway,llm_router", "backend", BLU),
+        ("postgresql", "patroni,pgbouncer [HA]", "data", GRN),
+        ("redis", "rate_limit,queues,cache", "data", GRN),
+        ("rabbitmq", "generation_pipeline", "data", GRN),
+        ("clickhouse", "analytics", "data", GRN),
+        ("langgraph", "agents,tool_calls", "ai", VIO),
+        ("llm_router", "health_score,circuit_breaker", "ai", VIO),
+        ("docker", "everything,including_phones", "infra", BLU),
+    ]
+    W = 1000
+    LH, y0 = 24, 92
+    H = y0 + LH * len(mods) + 34
+    rnd = random.Random(7)
+    rows = [f'<text y="{y0-30}" font-size="13.5" class="d"><tspan x="34">Module</tspan><tspan x="250">Size</tspan>'
+            f'<tspan x="360">Used by</tspan><tspan x="{W-34}" text-anchor="end">class</tspan></text>']
+    for i, (n, used, cls, col) in enumerate(mods):
+        y = y0 + i * LH
+        bw = rnd.uniform(.35, 1)
+        rows.append(
+            f'<g class="in" style="animation-delay:{.25+i*.07:.2f}s">'
+            f'<text x="34" y="{y}" font-size="14" fill="{col}">{n}</text>'
+            f'<text x="250" y="{y}" font-size="14" class="m">{rnd.randint(16, 980) * 64}</text>'
+            f'<text x="360" y="{y}" font-size="14" class="t">{rnd.randint(1,9)}  <tspan class="d">{escape(used)}</tspan></text>'
+            f'<rect x="{W-210}" y="{y-10}" width="{110*bw:.0f}" height="6" rx="3" fill="{col}" opacity=".55" '
+            f'style="transform-origin:{W-210}px 0;animation:grow .9s cubic-bezier(.2,.8,.2,1) {.3+i*.07:.2f}s both"/>'
+            f'<text x="{W-34}" y="{y}" font-size="12" text-anchor="end" class="m">{cls}</text></g>')
+    css = "@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}"
+    return frame(W, H, chrome(W, "lsmod  ·  loaded into HexFoc-Xp") + "".join(rows), css)
+
+
+# ── 6. buttons ───────────────────────────────────────────────────
+def button(label, sub, col, w=240):
+    H = 52
+    body = (f'<rect x="0" y="0" width="4" height="{H}" fill="{col}"/>'
+            f'<text x="22" y="22" font-size="11" class="m">{escape(sub)}</text>'
+            f'<text x="22" y="40" font-size="15" font-weight="700" fill="{col}">{escape(label)}</text>'
+            f'<text x="{w-18}" y="34" text-anchor="end" font-size="16" class="d">↗</text>')
+    return frame(w, H, body, r=10)
+
+
+def main():
+    OUT.mkdir(parents=True, exist_ok=True)
+    for old in OUT.glob("*.svg"):
+        old.unlink()
+    files = {
+        "hero.svg": hero(),
+        "impact.svg": impact(),
+        "globe.svg": globe(),
+        "boot.svg": boot(),
+        "matryoshka.svg": matryoshka(),
+        "lsmod.svg": lsmod(),
+        "btn-web.svg": button("HexFoc-Xp.com", "web", YEL),
+        "btn-tg.svg": button("@HexFoc-Xp", "telegram", BLU),
+    }
+    for name, svg in files.items():
+        (OUT / name).write_text(svg, encoding="utf-8")
+        print(f"  wrote assets/{name:<16} {len(svg)/1024:5.1f} KB")
+
+
+if __name__ == "__main__":
+    main()
