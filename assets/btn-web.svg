@@ -16,6 +16,7 @@
 text{font-family:ui-monospace,'JetBrains Mono','Fira Code','Cascadia Code',SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace;}
 .t{fill:#d7dde5} .d{fill:#7b8594} .m{fill:#4a5361}
 .y{fill:#ffd23f} .b{fill:#4c9aff} .g{fill:#5cff9d} .r{fill:#ff5c6c} .v{fill:#b28cff}
+.sw{fill:#fa6f30}
 .in{opacity:0;animation:in .01s linear forwards}
 @keyframes in{to{opacity:1}}
 .blink{animation:blink 1.05s steps(1) infinite}

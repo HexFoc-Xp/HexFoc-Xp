@@ -27,8 +27,9 @@
 </p>
 
 <p align="center">
-  <a href="https://suburdev-my.is-best.net"><img src="assets/btn-web.svg" width="24%" alt="suburdev-my.is-best.net"/></a>
-  <a href="https://t.me/HexFoc_Xp"><img src="assets/btn-tg.svg" width="24%" alt="Telegram @HexFoc_Xp"/></a>
+  <a href="https://suburdev-my.is-best.net"><img src="assets/btn-web.svg" width="22%" alt="suburdev-my.is-best.net"/></a>
+  <a href="https://t.me/HexFoc_Xp"><img src="assets/btn-tg.svg" width="22%" alt="Telegram @HexFoc_Xp"/></a>
+  <a href="https://saweria.co/HexFocXp"><img src="assets/btn-saweria.svg" width="22%" alt="Donate via Saweria"/></a>
 </p>
 
 <br/>

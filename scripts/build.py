@@ -27,6 +27,8 @@ LICENSE_ASSETS = "CC BY 4.0"
 BG, BG2, LINE = "#0b0d10", "#11151b", "#1d232c"
 TXT, DIM, MUTE = "#d7dde5", "#7b8594", "#4a5361"
 YEL, BLU, GRN, RED, VIO = "#ffd23f", "#4c9aff", "#5cff9d", "#ff5c6c", "#b28cff"
+# Saweria brand orange — used for the donate button
+SAW = "#fa6f30"
 MONO = ("ui-monospace,'JetBrains Mono','Fira Code','Cascadia Code',SFMono-Regular,"
         "Menlo,Consolas,'Liberation Mono',monospace")
 
@@ -34,6 +36,7 @@ BASE_CSS = f"""
 text{{font-family:{MONO};}}
 .t{{fill:{TXT}}} .d{{fill:{DIM}}} .m{{fill:{MUTE}}}
 .y{{fill:{YEL}}} .b{{fill:{BLU}}} .g{{fill:{GRN}}} .r{{fill:{RED}}} .v{{fill:{VIO}}}
+.sw{{fill:{SAW}}}
 .in{{opacity:0;animation:in .01s linear forwards}}
 @keyframes in{{to{{opacity:1}}}}
 .blink{{animation:blink 1.05s steps(1) infinite}}
@@ -746,6 +749,7 @@ def main():
         "backend.svg": backend(),
         "btn-web.svg": button("suburdev-my.is-best.net", "web", YEL, w=260, fs=13),
         "btn-tg.svg": button("@HexFoc_Xp", "telegram", BLU),
+        "btn-saweria.svg": button("Saweria", "donate ☕", SAW, w=240, fs=15),
     }
     for name, svg in files.items():
         (OUT / name).write_text(svg, encoding="utf-8")
