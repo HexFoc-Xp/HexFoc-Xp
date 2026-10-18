@@ -538,6 +538,200 @@ def button(label, sub, col, w=240, fs=15):
     return frame(w, H, body, r=10, name="link button")
 
 
+# ── 7. backend: live monitoring dashboard ────────────────────────
+def backend():
+    """Live backend monitoring dashboard.
+
+    Renders as a 2-section panel:
+      • Top:    topology diagram with animated packet flow + pulsing nodes
+      • Bottom: live log stream (terminal-style) + live metrics row
+
+    The whole thing is meant to feel "alive" — packets travel, nodes
+    pulse, log entries cycle in, counters tick. Pure CSS/SVG animation,
+    no JavaScript, so it works inside GitHub README.
+    """
+    W, H = 1000, 560
+    parts = [chrome(W, "topology  ·  HexFoc-Xp backend  ·  live")]
+
+    # ── Top section: topology ─────────────────────────────────────
+    # Node positions: (x, y, w, h, label, sub, color, status)
+    NODES = [
+        ( 60,  78, 140, 50, "Client",         "mobile · web · CLI",      TXT,  "ok"),
+        (260,  78, 160, 50, "API Gateway",    "FastAPI · CORS · JWT",    BLU,  "ok"),
+        (500,  50, 150, 50, "LLM Router",     "health · circuit",        VIO,  "ok"),
+        (500, 140, 150, 50, "Rate Limiter",   "redis token bucket",      YEL,  "ok"),
+        (740,  50, 200, 50, "OpenAI/Claude",  "external LLMs",           MUTE, "ok"),
+        (740, 140, 200, 50, "LangGraph",      "agents · tools",          VIO,  "ok"),
+        (260, 220, 160, 50, "PostgreSQL HA",  "Patroni · 3 nodes",       GRN,  "ok"),
+        (500, 220, 150, 50, "Redis Cache",    "queues · pubsub",         RED,  "warn"),
+        (740, 220, 200, 50, "ClickHouse",     "analytics · 1B rows",    GRN,  "ok"),
+        (500, 300, 150, 50, "RabbitMQ",       "generation jobs",        YEL,  "ok"),
+    ]
+
+    EDGES = [
+        (0, 1, TXT),   # Client → API Gateway
+        (1, 2, BLU),   # Gateway → LLM Router
+        (1, 3, YEL),   # Gateway → Rate Limiter
+        (2, 4, MUTE),  # LLM Router → OpenAI
+        (2, 5, VIO),   # LLM Router → LangGraph
+        (1, 6, GRN),   # Gateway → Postgres
+        (1, 7, RED),   # Gateway → Redis
+        (6, 8, GRN),   # Postgres → ClickHouse (CDC)
+        (5, 9, YEL),   # LangGraph → RabbitMQ
+        (7, 6, RED),   # Redis ↔ Postgres
+    ]
+
+    def nc(i):
+        x, y, w, h = NODES[i][:4]
+        return (x + w / 2, y + h / 2)
+
+    # Draw edges first (so nodes sit on top)
+    for ei, (a, b, col) in enumerate(EDGES):
+        ax, ay = nc(a)
+        bx, by = nc(b)
+        if abs(ay - by) > 30 and abs(ax - bx) > 100:
+            midx = (ax + bx) / 2
+            d = f"M{ax},{ay} H{midx} V{by} H{bx}"
+        else:
+            d = f"M{ax},{ay} L{bx},{by}"
+        # static dashed line
+        parts.append(
+            f'<path d="{d}" fill="none" stroke="{col}" stroke-width="1.5" '
+            f'opacity=".4" stroke-dasharray="4 4"/>'
+        )
+        # animated packet dot — travels along the path, loops indefinitely
+        dur = 2.2 + (ei % 4) * 0.6
+        delay = ei * 0.35
+        parts.append(
+            f'<circle r="4" fill="{YEL}">'
+            f'<animateMotion dur="{dur}s" repeatCount="indefinite" '
+            f'begin="{delay}s" path="{d}"/>'
+            f'<animate attributeName="opacity" values="0;1;1;0" '
+            f'dur="{dur}s" repeatCount="indefinite" begin="{delay}s"/>'
+            f'</circle>'
+        )
+
+    # Draw nodes (rounded rect + status dot + label + sub)
+    for i, (x, y, w, h, label, sub, col, status) in enumerate(NODES):
+        d = 0.2 + i * 0.06
+        # status color: ok=green, warn=yellow, err=red
+        sc = GRN if status == "ok" else (YEL if status == "warn" else RED)
+        parts.append(
+            f'<g class="in" style="animation-delay:{d:.2f}s">'
+            f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="8" '
+            f'fill="{BG2}" stroke="{col}" stroke-width="1.5"/>'
+            f'<rect x="{x}" y="{y}" width="3" height="{h}" fill="{col}"/>'
+            # pulsing status dot in top-right corner of node
+            f'<circle cx="{x + w - 14}" cy="{y + 14}" r="4" fill="{sc}" '
+            f'class="gbeat" style="animation-delay:{i*0.2}s"/>'
+            f'<text x="{x+14}" y="{y+22}" font-size="14" font-weight="700" fill="{col}">{escape(label)}</text>'
+            f'<text x="{x+14}" y="{y+38}" font-size="10" class="d">{escape(sub)}</text>'
+            f'</g>'
+        )
+
+    # ── Metrics bar (4 live counters) ─────────────────────────────
+    bar_y = 360
+    metrics = [
+        ("3.2M",    "req / day",      YEL, "ok"),
+        ("99.97%",  "uptime",         GRN, "ok"),
+        ("87ms",    "p50 latency",    BLU, "ok"),
+        ("0.03%",   "error rate",     RED, "warn"),
+    ]
+    bar_w = (W - 2 * 40 - 3 * 14) / 4
+    for i, (val, label, col, status) in enumerate(metrics):
+        bx = 40 + i * (bar_w + 14)
+        sc = GRN if status == "ok" else YEL
+        d = 0.5 + i * 0.1
+        parts.append(
+            f'<g class="in" style="animation-delay:{d:.2f}s">'
+            f'<rect x="{bx}" y="{bar_y}" width="{bar_w:.0f}" height="56" rx="8" '
+            f'fill="{BG2}" stroke="{LINE}"/>'
+            f'<rect x="{bx}" y="{bar_y+8}" width="3" height="40" fill="{col}"/>'
+            f'<text x="{bx+14}" y="{bar_y+24}" font-size="10" class="m">{escape(label)}</text>'
+            f'<text x="{bx+14}" y="{bar_y+46}" font-size="22" font-weight="800" fill="{col}">{val}</text>'
+            # live pulse indicator
+            f'<circle cx="{bx + bar_w - 14:.0f}" cy="{bar_y + 14}" r="3" fill="{sc}" '
+            f'class="gbeat" style="animation-delay:{i*0.15}s"/>'
+            f'</g>'
+        )
+
+    # ── Live log stream (bottom section) ───────────────────────────
+    log_y0 = 440
+    log_lh = 18
+    log_entries = [
+        ("12:04:21", "POST", "/v1/chat/completions",      "200",  "87ms",   GRN),
+        ("12:04:21", "POST", "/v1/chat/completions",      "200",  "91ms",   GRN),
+        ("12:04:22", "GET",  "/health",                    "200",  "2ms",    GRN),
+        ("12:04:22", "POST", "/v1/chat/completions",      "429",  "rate-limit", YEL),
+        ("12:04:22", "POST", "/v1/embeddings",            "200",  "124ms",  GRN),
+        ("12:04:23", "POST", "/v1/chat/completions",      "200",  "78ms",   GRN),
+        ("12:04:23", "POST", "/v1/chat/completions",      "200",  "85ms",   GRN),
+        ("12:04:23", "POST", "/agents/run",               "200",  "1.2s",   VIO),
+    ]
+
+    # log header
+    parts.append(
+        f'<text x="40" y="{log_y0 - 8}" font-size="11" class="m">// live access log · tail -f</text>'
+        f'<circle cx="170" cy="{log_y0 - 12}" r="3" fill="{GRN}" class="gbeat"/>'
+    )
+    # column headers
+    parts.append(
+        f'<text x="40" y="{log_y0 + 8}" font-size="11" class="m">'
+        f'<tspan class="m">TIME</tspan>'
+        f'<tspan x="120" class="m">METHOD</tspan>'
+        f'<tspan x="200" class="m">PATH</tspan>'
+        f'<tspan x="430" class="m">STATUS</tspan>'
+        f'<tspan x="500" class="m">LATENCY</tspan>'
+        f'</text>'
+    )
+    parts.append(
+        f'<line x1="40" y1="{log_y0 + 14}" x2="{W - 40}" y2="{log_y0 + 14}" stroke="{LINE}"/>'
+    )
+
+    # log rows — appear with staggered animation, then blink cursor at the end
+    method_class = {GRN: "g", YEL: "y", RED: "r", VIO: "v", BLU: "b", MUTE: "m", TXT: "t"}
+    for i, (ts, method, path, status, latency, col) in enumerate(log_entries):
+        y = log_y0 + 32 + i * log_lh
+        d = 0.8 + i * 0.15
+        # color status code based on value
+        if status.startswith("2"):  sc = GRN
+        elif status.startswith("4"): sc = YEL
+        elif status.startswith("5"): sc = RED
+        else: sc = TXT
+        mc = method_class.get(col, "t")
+        parts.append(
+            f'<g class="in" style="animation-delay:{d:.2f}s">'
+            f'<text x="40"  y="{y}" font-size="11" class="d">{ts}</text>'
+            f'<text x="120" y="{y}" font-size="11" class="{mc}">{method}</text>'
+            f'<text x="200" y="{y}" font-size="11" class="t">{path}</text>'
+            f'<text x="430" y="{y}" font-size="11" font-weight="700" fill="{sc}">{status}</text>'
+            f'<text x="500" y="{y}" font-size="11" class="d">{latency}</text>'
+            f'</g>'
+        )
+
+    # blinking cursor at the very bottom (suggests "live tail")
+    cur_y = log_y0 + 32 + len(log_entries) * log_lh + 4
+    parts.append(
+        f'<rect x="40" y="{cur_y}" width="9" height="14" class="y blink"/>'
+    )
+
+    # ── Footer prompt ─────────────────────────────────────────────
+    parts.append(
+        f'<g class="in" style="animation-delay:2.5s">'
+        f'<text x="40" y="{H - 12}" font-size="13">'
+        f'<tspan class="g">ops@prod</tspan><tspan class="m">:</tspan>'
+        f'<tspan class="b">~</tspan><tspan class="m">$ </tspan>'
+        f'<tspan class="t">kubectl get pods -A | grep -v Running</tspan>'
+        f'</text></g>'
+    )
+
+    css = """
+.gbeat{transform-box:fill-box;transform-origin:center;animation:gbeat 1.6s ease-in-out infinite}
+@keyframes gbeat{50%{transform:scale(1.7);opacity:.4}}
+"""
+    return frame(W, H, "".join(parts), css, name="backend topology dashboard")
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     for old in OUT.glob("*.svg"):
@@ -549,6 +743,7 @@ def main():
         "boot.svg": boot(),
         "matryoshka.svg": matryoshka(),
         "lsmod.svg": lsmod(),
+        "backend.svg": backend(),
         "btn-web.svg": button("suburdev-my.is-best.net", "web", YEL, w=260, fs=13),
         "btn-tg.svg": button("@HexFoc_Xp", "telegram", BLU),
     }

@@ -31,6 +31,14 @@
   <a href="https://t.me/HexFoc_Xp"><img src="assets/btn-tg.svg" width="24%" alt="Telegram @HexFoc_Xp"/></a>
 </p>
 
+<br/>
+
+<p align="center">
+  <img src="assets/backend.svg" width="100%" alt="HexFoc-Xp backend topology · live monitoring dashboard · packets flowing · log streaming"/>
+</p>
+
+<p align="center"><sub>— live backend dashboard · ~3.2M req/day · 99.97% uptime —</sub></p>
+
 ---
 
 <details>
