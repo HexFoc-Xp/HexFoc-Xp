@@ -30,3 +30,35 @@
   <a href="https://HexFoc-Xp.com"><img src="assets/btn-web.svg" width="24%" alt="HexFoc-Xp.com"/></a>
   <a href="https://t.me/HexFoc-Xp"><img src="assets/btn-tg.svg" width="24%" alt="Telegram @HexFoc-Xp"/></a>
 </p>
+
+---
+
+<details>
+<summary>📜 License &amp; credits</summary>
+
+<br/>
+
+- **Code** ( [`scripts/build.py`](scripts/build.py) ) — licensed under the **[MIT License](LICENSE)**.
+- **Visual assets** (everything under [`assets/`](assets/) — SVG files and the
+  rendered visuals they produce) — licensed under
+  **[Creative Commons Attribution 4.0 International (CC BY 4.0)](LICENSE-ASSETS)**.
+
+You are free to use, copy, modify, and redistribute both, even commercially,
+**as long as you give appropriate credit** to
+[`HexFoc-Xp`](https://github.com/HexFoc-Xp) and link to the license.
+
+Suggested attribution:
+
+> *HexFoc-Xp profile assets by [HexFoc-Xp](https://github.com/HexFoc-Xp)
+> are licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).*
+
+Every generated SVG also embeds machine-readable `<metadata>` (RDF/CC) carrying
+the author, source repo, and license URL — so the attribution travels with the
+file even if someone downloads the raw SVG.
+
+</details>
+
+<p align="center">
+  <sub>— built with 🇮🇩 by <a href="https://github.com/HexFoc-Xp">HexFoc-Xp</a> —</sub>
+</p>
+
