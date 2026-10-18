@@ -27,8 +27,8 @@
 </p>
 
 <p align="center">
-  <a href="https://HexFoc-Xp.com"><img src="assets/btn-web.svg" width="24%" alt="HexFoc-Xp.com"/></a>
-  <a href="https://t.me/HexFoc-Xp"><img src="assets/btn-tg.svg" width="24%" alt="Telegram @HexFoc-Xp"/></a>
+  <a href="https://suburdev-my.is-best.net"><img src="assets/btn-web.svg" width="24%" alt="suburdev-my.is-best.net"/></a>
+  <a href="https://t.me/HexFoc_Xp"><img src="assets/btn-tg.svg" width="24%" alt="Telegram @HexFoc_Xp"/></a>
 </p>
 
 ---

@@ -523,11 +523,17 @@ def lsmod():
 
 
 # ── 6. buttons ───────────────────────────────────────────────────
-def button(label, sub, col, w=240):
+def button(label, sub, col, w=240, fs=15):
+    """A small link button.
+
+    fs lets callers shrink the label font for longer URLs (e.g. a long
+    domain like suburdev-my.is-best.net) so the text never collides
+    with the ↗ arrow on the right.
+    """
     H = 52
     body = (f'<rect x="0" y="0" width="4" height="{H}" fill="{col}"/>'
             f'<text x="22" y="22" font-size="11" class="m">{escape(sub)}</text>'
-            f'<text x="22" y="40" font-size="15" font-weight="700" fill="{col}">{escape(label)}</text>'
+            f'<text x="22" y="40" font-size="{fs}" font-weight="700" fill="{col}">{escape(label)}</text>'
             f'<text x="{w-18}" y="34" text-anchor="end" font-size="16" class="d">↗</text>')
     return frame(w, H, body, r=10, name="link button")
 
@@ -543,8 +549,8 @@ def main():
         "boot.svg": boot(),
         "matryoshka.svg": matryoshka(),
         "lsmod.svg": lsmod(),
-        "btn-web.svg": button("HexFoc-Xp.com", "web", YEL),
-        "btn-tg.svg": button("@HexFoc-Xp", "telegram", BLU),
+        "btn-web.svg": button("suburdev-my.is-best.net", "web", YEL, w=260, fs=13),
+        "btn-tg.svg": button("@HexFoc_Xp", "telegram", BLU),
     }
     for name, svg in files.items():
         (OUT / name).write_text(svg, encoding="utf-8")
